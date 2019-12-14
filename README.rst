@@ -10,10 +10,7 @@ Include header ``simple_print.h``.
 
     simple_print::printf("{}", 5); // print the integer 5
 
-The format of placeholders is almost the same as printf except that
-
-* The type is optional
-* placeholder is enclosed in ``{}`` instead of ``%``
+* Arguments are enclosed in ``{}``
 * Use ``{{`` and ``}}`` to print ``{`` and ``}`` respectively
 
 Custom type is supported
