@@ -41,6 +41,15 @@ namespace simple_print
 template<typename T, typename Enable = void>
 struct format_type;
 
+template<>
+struct format_type<char>
+{
+    static std::string format(char c)
+    {
+        return std::string(1, c);
+    }
+};
+
 template<typename Int>
 struct format_type<Int, typename std::enable_if<std::is_integral<Int>::value>::type>
 {
