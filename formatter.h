@@ -51,7 +51,7 @@ struct format_type<char>
 };
 
 template<typename Int>
-struct format_type<Int, typename std::enable_if<std::is_integral<Int>::value>::type>
+struct format_type<Int, typename std::enable_if_t<std::is_integral_v<Int>>>
 {
     static std::string format(Int i)
     {
@@ -60,7 +60,7 @@ struct format_type<Int, typename std::enable_if<std::is_integral<Int>::value>::t
 };
 
 template<typename Float>
-struct format_type<Float, typename std::enable_if<std::is_floating_point<Float>::value>::type>
+struct format_type<Float, typename std::enable_if_t<std::is_floating_point_v<Float>>>
 {
     static std::string format(Float f)
     {
@@ -93,41 +93,34 @@ struct format_args
 {
     std::function<std::string()> f;
 
-    template<typename Int, typename std::enable_if<std::is_integral<Int>::value, int>::type = 0>
+    template<typename Int, typename std::enable_if_t<std::is_integral_v<Int>, int> = 0>
     format_args(Int i)
-        : f(std::bind(format_type<Int>::format, i))
+        : f([i] { return format_type<Int>::format(i); })
     {
     }
 
-    template<typename Float, typename std::enable_if<std::is_floating_point<Float>::value, int>::type = 0>
+    template<typename Float, typename std::enable_if_t<std::is_floating_point_v<Float>, int> = 0>
     format_args(Float f)
-        : f(std::bind(format_type<Float>::format, f))
+        : f([f] { return format_type<Float>::format(f); })
     {
     }
 
-    template<typename CString, typename std::enable_if<is_cstring<CString>::value, int>::type = 0>
+    template<typename CString, typename std::enable_if_t<is_cstring_v<CString>, int> = 0>
     format_args(CString s)
-        : f(std::bind(format_type<const char*>::format, s))
+        : f([s] { return format_type<const char*>::format(s); })
     {
     }
 
-    template<typename Pointer, typename std::enable_if<
-        std::is_pointer<Pointer>::value &&
-        !is_cstring<Pointer>::value, int>::type = 0
+    template<typename Pointer, typename std::enable_if_t<my_is_pointer_v<Pointer>, int> = 0
     >
     format_args(Pointer p)
-        : f(std::bind(format_type<Pointer>::format, p))
+        : f([p] { return format_type<Pointer>::format(p); })
     {
     }
 
-    template<
-        typename Custom, typename std::enable_if<
-            !std::is_arithmetic<Custom>::value &&
-            !std::is_pointer<Custom>::value &&
-            !is_cstring<Custom>::value, int>::type = 0
-    >
+    template<typename Custom, typename std::enable_if_t<is_custom_v<Custom>, int> = 0>
     format_args(const Custom& c)
-        : f(std::bind(format_type<Custom>::format, std::cref(c)))
+        : f([&c] { return format_type<Custom>::format(std::cref(c)); })
     {
     }
 };

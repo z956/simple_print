@@ -50,4 +50,13 @@ struct is_cstring<const char*> : public std::true_type {};
 template<std::size_t Size>
 struct is_cstring<char[Size]> : public std::true_type {};
 
+template<typename T>
+constexpr static bool is_cstring_v = is_cstring<T>::value;
+
+template<typename T>
+constexpr static bool my_is_pointer_v = std::is_pointer_v<T> && !is_cstring_v<T>;
+
+template<typename T>
+constexpr static bool is_custom_v = !std::is_arithmetic_v<T> && !std::is_pointer_v<T> && !is_cstring_v<T>;
+
 }
